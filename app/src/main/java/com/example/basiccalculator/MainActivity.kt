@@ -1,12 +1,10 @@
 package com.example.basiccalculator
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
-import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlin.ArithmeticException
 
 class MainActivity : AppCompatActivity() {
 
@@ -42,38 +40,21 @@ class MainActivity : AppCompatActivity() {
                 }
                 with(tvValue) {
                     when {
-                        contains("-") -> {
-                            result = tvValue.split("-")
-                                .mapIndexed{i, v -> if (i == 0) {prefix?.plus(v) ?: v} else v} // Add the prefix? to the first element
-                                .map { value -> value.toFloat() }
+                        contains("-") ->
+                            result = getNumbersFromString(tvValue, "-", prefix)
                                 .reduce { a, b -> a - b }.toString()
-                            tvInput.text = result
-                        }
-                        contains("+") -> {
-                            result = tvValue.split("+")
-                                .mapIndexed{i, v -> if (i == 0) {prefix?.plus(v) ?: v} else v} // Add the prefix? to the first element
-                                .map { value -> value.toFloat() }
+                        contains("+") ->
+                            result = getNumbersFromString(tvValue, "+", prefix)
                                 .reduce { a, b -> a + b }.toString()
-                            tvInput.text = result
-                        }
-                        contains("/") -> {
-                            result = tvValue
-                                .split("/")
-                                .mapIndexed{i, v -> if (i == 0) {prefix?.plus(v) ?: v} else v} // Add the prefix? to the first element
-                                .map { value -> value.toFloat() }
-                                .reduce { a, b -> a / b }
-                                .toString()
-                            tvInput.text = result
-                        }
-                        contains("*") -> {
-                            result = tvValue.split("*")
-                                .mapIndexed{i, v -> if (i == 0) {prefix?.plus(v) ?: v} else v} // Add the prefix? to the first element
-                                .map { value -> value.toFloat() }
+                        contains("/") ->
+                            result = getNumbersFromString(tvValue, "/", prefix)
+                                .reduce { a, b -> a / b }.toString()
+                        contains("*") ->
+                            result = getNumbersFromString(tvValue, "*", prefix)
                                 .reduce { a, b -> a * b }.toString()
-                            tvInput.text = result
-                        }
                     }
                 }
+                tvInput.text = result
             } catch (e: ArithmeticException) {
                 e.printStackTrace()
             } finally {
@@ -106,5 +87,11 @@ class MainActivity : AppCompatActivity() {
         } else {
             value.contains(Regex("[+\\-*/]"))
         }
+    }
+
+    private fun getNumbersFromString(value: CharSequence, operator: String, prefix: String?): List<Double>{
+        return value.split(operator)
+                .mapIndexed{i, v -> if (i == 0) {prefix?.plus(v) ?: v} else v} // Add the prefix? to the first element
+                .map { v -> v.toDouble() }
     }
 }
